@@ -1,0 +1,37 @@
+---
+
+# VARIABLES
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_HOST: tcp://localhost:2375
+  DOCKER_HUB_IMAGE: ""
+  TRUNK_TAG: ""
+
+##########################################################################################################
+
+## PIPELINE DEFINITION
+stages:
+  - pack
+
+##########################################################################################################
+
+### COMMON SECTION
+.common_docker:
+  image: $DOCKER_IMAGE
+  services:
+    - $DIND_IMAGE
+  before_script:
+    - docker login -u gitlab-ci-token -p ${CI_BUILD_TOKEN} ${CI_REGISTRY}
+    - alias drr="docker run --rm -v \${PWD}:\${PWD} -w \${PWD}"
+
+##########################################################################################################
+
+#### BUILD SECTION
+docker:
+  extends: .common_docker
+  stage: pack
+  script:
+    - docker pull "${DOCKER_HUB_PATH}/${DOCKER_HUB_IMAGE}:${DOCKER_HUB_TAG}"
+    - docker tag "${DOCKER_HUB_PATH}/${DOCKER_HUB_IMAGE}:${DOCKER_HUB_TAG}" "${CI_REGISTRY_IMAGE}/${DOCKER_HUB_IMAGE}:${DOCKER_HUB_TAG}"
+    - docker push "${CI_REGISTRY_IMAGE}/${DOCKER_HUB_IMAGE}:${DOCKER_HUB_TAG}"
+
