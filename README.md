@@ -1,5 +1,5 @@
 # DH2CI
-Saving Docker Hub images in codeinside.ru registry
+Saving Docker Hub images in YOUR_REGISTRY.ru registry
 
 Variable:
 
